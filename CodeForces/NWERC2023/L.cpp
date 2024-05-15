@@ -23,7 +23,7 @@ int shoot(int x, int y)
 int main()
 {
 	cin >> n >> k;
-	string s;
+	string s
 	for (int i = 1; i <= n && k; i++)
 		for (int j = (i % 5 == 0 ? 5 : i % 5); j <= n && k; j += 5)
 		{
