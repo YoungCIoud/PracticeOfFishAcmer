@@ -1,58 +1,50 @@
-//纯纯是思维 哎
+// 代码还是哥哥的好
 #include<bits/stdc++.h>
 using namespace std;
 #define int long long
 #define IOS ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
-const int N = 1e6, M = 1ll << 32, Inf = 1e16, Mod = 1e9 + 7;
-int cnt = 1;
-map<pair<int, int>, int> f;
-int hah(pair<int, int> pos)
-{
-	if (f[pos])
-		return f[pos];
+const int N = 800, M = 1ll << 32, Inf = 1e16, Mod = 1e9 + 7;
 
-	f[pos] = cnt;
-	return cnt++;
-}
-vector<vector<int>> pos(N + 5);
-signed main()
+void solve()
 {
-	IOS;
 	int n, x, y;
 	cin >> n >> x >> y;
 	string s;
 	cin >> s;
-	if (x == 0 && y == 0)
-	{
-		cout << (n * (n + 1) / 2);
-		return 0;
-	}
+	vector<array<int, 2>> a(n + 1);
+	a[0] = { 0, 0 };
 	for (int i = 0; i < n; i++)
 	{
-		static int tx = 0, ty = 0;
-		if (s[i] == 'W') ty++;
-		else if (s[i] == 'S') ty--;
-		else if (s[i] == 'A') tx--;
-		else tx++;
-		pos[hah({ tx, ty })].push_back(i);
+		a[i + 1] = a[i];
+		if (s[i] == 'W')
+			a[i + 1][1]++;
+		else if (s[i] == 'S')
+			a[i + 1][1]--;
+		else if (s[i] == 'D')
+			a[i + 1][0]++;
+		else
+			a[i + 1][0]--;
 	}
-	int ans = 0;
-	for (int i = 0; i < n; i++)
-	{
-		int tar = hah({ x, y });
-		int r = -1;
-		if (!pos[tar].empty())
-		{
-			r = lower_bound(pos[tar].begin(), pos[tar].end(), i) - pos[tar].begin();
-			if (r < pos[tar].size() && r >= 0)
-				ans += n - pos[tar][r];
-		}
 
-		if (s[i] == 'W') y++;
-		else if (s[i] == 'S') y--;
-		else if (s[i] == 'A') x--;
-		else x++;
+	map<array<int, 2>, int> idx;
+	int ans = 0;
+	for (int i = n; ~i; i--)
+	{
+		idx[a[i]] = i;
+		if (idx.count({ a[i][0] + x, a[i][1] + y }))
+		{
+			int j = idx[{ a[i][0] + x, a[i][1] + y }];
+			j = max(j, i + 1);
+			ans += n - j + 1;
+		}
 	}
-	cout << ans << endl;
-	return 0;
+	cout << ans;
+	return;
+}
+signed main()
+{
+	int t = 1;
+	//cin >> t;
+	while (t--)
+		solve();
 }
