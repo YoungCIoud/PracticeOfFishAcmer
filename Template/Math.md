@@ -44,3 +44,30 @@ bool miller_rabin(i64 p)
 }
 ```
 关于检测时使用的底数,在待检验数在$2^{32}$以下时用{ 2 ,7 ,61 }就可以了,否则用{ 2, 325, 9375, 28178, 450775, 9780504, 1795265022 }.
+
+## 快速因数分解 Pollard's Rho
+```cpp
+// 随机数
+std::mt19937_64 rnd(time(0));
+
+i64 pollard_rho(i64 x)
+{
+    i64 c = rnd() % (x - 1) + 1;
+    i64 a = 0, b = 0, val = 1;
+    for (int k = 1; ; k <<= 1, b = a, val = 1)
+    {
+        for (int i = 1; i <= k; i++)
+        {
+            a = (mul(a, a, x) + c) % x;
+            val = mul(val, abs(a - b), x);
+            if (i % 127 == 0)
+            {
+                i64 d = std::__gcd(val, x);
+                if (d > 1) return d;
+            }
+        }
+        i64 d = std::__gcd(val, x);
+        if (d > 1) return d;
+    }
+}
+```
