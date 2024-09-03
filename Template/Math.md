@@ -1,3 +1,46 @@
+## gcd
+**递归版**
+```c++
+int gcd(int a, int b)
+{
+    return b ? gcd(b, a % b) : a;
+}
+```
+**循环版**
+```c++
+int gcd(int a, int b)
+{
+    while (b)
+    {
+        int t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+```
+
+## 快速幂
+```c++
+i64 qpow(i64 a, i64 p, i64 mod)
+{
+    i64 res = 1;
+    for (; p; p >>= 1, a = a * a % mod)
+        if (p & 1) res = res * a % mod;
+    return res;
+}
+```
+
+## 逆元
+**费马小定理**
+```c++
+// a 在模p(质数)下的逆元
+i64 inv(i64 a, i64 p)
+{
+    return qpow(a, p - 2, p);
+}
+```
+
 ## miller-rabin 质数检测
 
 将费马小定理中的指数$p - 1$(一个偶数)分解为$2 ^ k t(t\%2=1)$.  
