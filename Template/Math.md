@@ -40,6 +40,41 @@ i64 inv(i64 a, i64 p)
     return qpow(a, p - 2, p);
 }
 ```
+**拓展欧几里得求逆元**
+
+
+```cpp
+// 返回gcd(a,b)
+int extend_gcd(long long a, int b, long long &x, long long &y)
+{
+    if (b == 0)
+    {
+        x = 1, y = 0;
+        return a;
+    }
+    int res = extend_gcd(b, a % b, x, y);
+
+    int t = x;
+    x = y;
+    y = t - (a / b) * y;
+
+    return res;
+}
+
+// 求a关于p的逆元
+long long inv(long long a, int p)
+{
+    long long x = 0, y = 0;
+    extend_gcd(a, p, x, y);
+
+    return (x % p + p) % p;
+}
+```
+
+## 随机数
+```c++
+std::mt19937_64 rnd(std::chrono::steady_clock::now().time_since_epoch().count());
+```
 
 ## miller-rabin 质数检测
 
@@ -112,5 +147,44 @@ i64 pollard_rho(i64 x)
         i64 d = std::__gcd(val, x);
         if (d > 1) return d;
     }
+}
+```
+
+## 容斥原理的应用:求区间内和某一个数互质的数的个数
+
+首先对于一个质数$p$, 我们可以很快地找到在区间[1, n]内有多少数和他不互质($\lfloor \frac{n}{p} \rfloor$), 用n减去这个数就得到了区间内和$p$互质的数的个数.
+
+那么对于任意一个数$q$, 我们可以求得他所有的质因数$p_0,p_1,...,p_k$. 接下来用容斥原理反向求区间内跟这些数都不互质的数的个数问题就解决了.
+
+```cpp
+// 返回[1,n]内有多少个数同m互质
+i64 cnt(int n, int m)
+{
+    // 求m的质因数
+    num = 0;
+    for (int i = 2; i * i <= m; i++)
+    {
+        if (m % i) continue;
+        while (m % i == 0) m /= i;
+        pr[num++] = i;
+    }
+    if (m != 1) pr[num++] = m;
+
+    // 区间内和m不互质的数的个数
+    i64 res = 0;
+    // 枚举质因数的组合情况
+    for (int i = 1; i < (1 << num); i++)
+    {
+        int p = 1, cnt = 0;
+        for (int j = 0; j < num; j++)
+            if ((i >> j) & 1) p *= pr[j], cnt++;
+        // 容斥
+        // 若是奇数个质因数组合, 则+
+        // 否则-
+        if (cnt & 1) res += n / p;
+        else res -= n / p;
+    }
+
+    return n - res;
 }
 ```
