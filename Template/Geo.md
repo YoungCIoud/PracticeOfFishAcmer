@@ -96,3 +96,40 @@ int main()
     return 0;
 }
 ```
+
+## 极角排序
+
+**极角定义**  
+在平面上任取一个顶点$O$，称为极点；作射线$OX$，那么$OX$就是极轴。平面上任意一点和$O$点作向量，与$OX$形成的夹角就叫做极角。通常选定逆时针方向为正，一般我们以$x$轴为极轴，那么极角就是平面向量与$x$轴的夹角
+
+**极角排序**  
+给定极轴, 将平面上的点按照极角的大小排序就叫极角排序.  
+当极角相当时, 按长度排序.
+
+
+```cpp
+// 版本1
+// O是极点
+inline bool cmp(Node &A, Node &B)
+{
+    std::pair<int, int> OA = { A.x - O.x, A.y - O.y }, OB = { B.x - O.x, B.y - O.y };
+    if (OA ^ OB) return (OA ^ OB) > 0;
+    else return OA.first < OB.first;
+}
+```
+```cpp
+// 版本2
+inline bool cmp(Node &A, Node &B)
+{
+    // 考虑向量和OP同向
+    if (A.y == O.y && A.x >= O.x) return true;
+    if (B.y == O.y && B.x >= O.x) return false;
+
+    std::pair<int, int> OP = { 1, 0 }, OA = { A.x - O.x, A.y - O.y }, OB = { B.x - O.x, B.y - O.y };
+    // 考虑OA和OB在OP异侧
+    if (((OP ^ OA) > 0) ^ ((OP ^ OB) > 0)) return (OP ^ OA) > 0;
+    else return (OA ^ OB) > 0;
+}
+```
+
+**例题** [Almost Convex](https://codeforces.com/gym/104901/problem/M)
