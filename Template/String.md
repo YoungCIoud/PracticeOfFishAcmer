@@ -217,8 +217,8 @@ struct Hash
 {
     const i64 P = 1e12 + 39;
     const int B = 13331;
-    vct<i64> h, p;
-    Hash(str s) : h(s.size() + 1), p(s.size() + 1) {
+    std::vector<i64> h, p;
+    Hash(std::string s) : h(s.size() + 1), p(s.size() + 1) {
         int n = s.size();
         p[0] = 1;
         for (int i = 0; i < n; i++) {
@@ -232,4 +232,53 @@ struct Hash
         return (h[r] + __int128(h[l]) * (P - p[r - l])) % P;
     }
 };
+```
+
+## 倍增求后缀数组
+// 以下代码能够求包含大小写字母和数字的字符串的后缀数组, 且按照ASCII码大小排序
+```c++
+std::vector<int> get(std::string &s, int n) {
+    std::vector<int> sa(n, 0), rk(n * 2, 0), tmp(n * 2, 0), cnt(n + 'z', 0);
+    // init
+    for (int i = 0; i < n; i++) {
+        cnt[s[i]]++;
+    }
+    for (int i = 1; i <= 'z'; i++) {
+        cnt[i] += cnt[i - 1];
+    }
+    for (int i = n - 1; i >= 0; i--) {
+        sa[--cnt[s[i]]] = i;
+    }
+    rk[sa[0]] = 1;
+    for (int i = 1, p = 1; i < n; i++) {
+        rk[sa[i]] = (s[sa[i]] == s[sa[i - 1]] ? p : ++p);
+    }
+
+    // a -> b
+    auto trans = [&](std::vector<int> &a, std::vector<int> &b, int d) -> void {
+        std::fill(cnt.begin(), cnt.end(), 0);
+        for (int i = 0; i < n; i++) {
+            cnt[rk[i + d]]++;
+        }
+        for (int i = 1; i <= n; i++) {
+            cnt[i] += cnt[i - 1];
+        }
+        for (int i = n - 1; i >= 0; i--) {
+            b[--cnt[rk[a[i] + d]]] = a[i];
+        }
+    };
+    for (int k = 1; k < n; k <<= 1) {
+        trans(sa, tmp, k), trans(tmp, sa, 0);
+
+        tmp[sa[0]] = 1;
+        for (int i = 1, p = 1; i < n; i++) {
+            if (rk[sa[i]] > rk[sa[i - 1]] || rk[sa[i] + k] > rk[sa[i - 1] + k]) {
+                p++;
+            }
+            tmp[sa[i]] = p;
+        }
+        rk = tmp;
+    }
+    return sa;
+}
 ```
