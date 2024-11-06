@@ -1,0 +1,42 @@
+#include<bits/stdc++.h>
+#define IOS std::ios::sync_with_stdio(false), std::cin.tie(0), std::cout.tie(0)
+
+using i64 = long long;
+using i128 = __int128_t;
+
+constexpr i64 Mod = 998244353, Inf = 1e18;
+constexpr int N = 1e5, M = 1e5;
+
+void print(int n, int x, std::array<char, 2> c) {
+    for (int i = 1; i <= n - 1; i++) {
+        std::cout << c[x * 2 <= n];
+    }
+    for (int i = 1; i <= std::min(x - 1, n - x); i++) {
+        std::cout << c[x * 2 > n];
+    }
+}
+
+void solve()
+{
+    int n = 0, x = 0, y = 0;
+    std::cin >> n >> x >> y;
+    print(n, x, { 'D', 'U' });
+    print(n, y, { 'R', 'L' });
+    return void(puts(""));
+}
+
+int main()
+{
+    // IOS;
+    int t = 1;
+    // std::cin >> t;
+    
+    while (t--)
+    {
+        solve();
+    }
+
+    system("pause");
+
+    return 0;
+}
