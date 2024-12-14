@@ -13,6 +13,7 @@ bool match(int cur)
 {
 	for (int i = 1; i <= n; i++)
 	{
+		// cur 和 i 之间无边 或者 在此次匹配中i已经访问过了
 		if (!mp[cur][i] || vis[i]) continue;
 		
 		vis[i] = true;
