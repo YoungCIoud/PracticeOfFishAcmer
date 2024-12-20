@@ -267,7 +267,7 @@ void solve()
 }
 ```
 
-## [I Hate Sigma Problems](https://atcoder.jp/contests/abc371/tasks/abc371_e)
+## [I Hate Sigma Problems](https://atcoder.jp/contests/abc371/tasks/abc371_e)（组合数学 计数）
 
 ### 题解（题意见链接）
 
@@ -283,7 +283,7 @@ void solve()
 相邻下标内的区间就是未出现 $x$ 的区间.
 用总的区间数减去这个这些区间就是 $x$ 的贡献了.
 
-## [Takahashi in Narrow Road](https://atcoder.jp/contests/abc371/tasks/abc371_f)
+## [Takahashi in Narrow Road](https://atcoder.jp/contests/abc371/tasks/abc371_f)（模拟技巧）
 
 ### 题解（题意见链接）
 
@@ -348,6 +348,77 @@ void solve()
     }
     it->second = tar;
     }
+```
+
+## [Georgia and Bob](http://poj.org/problem?id=1704)（阶梯博弈）
+
+### 题解（题意见链接）
+
+#### 解题思路
+
+我们先只看 3 个棋子， 则三个棋子会产生 2 段空白格子。 将中间的棋子往左移会导致左边的空白变少而右边的空白变大， 这就等价于在左边的空白中挑选部分移到右边的空白。
+
+有了这点观察后， 问题就变成了给出若干段空白最先将所有空白移到最右边的人输， 基本上就是裸的阶梯博弈了。
+
+#### CODE
+
+```cpp
+int main () {
+    int t = 1;
+    std::cin >> t;
+    while (t--) {
+        int n = 0;
+        std::cin >> n;
+        std::vector<int> p(n, 0);
+        for (int i = 0; i < n; i++) {
+            std::cin >> p[i];
+            p[i] = -p[i];
+        }
+        std::sort(p.begin(), p.end());
+        int ans = 0;
+        for (int i = 1; i < n; i += 2) {
+            // 两个棋子之间的空白格的数量
+            ans ^= (p[i] - p[i - 1] - 1);
+        }
+        if (n & 1) {
+            // n 为奇数时， 最左边的棋子左边一段的空白也要算进去
+            ans ^= -p.back() - 1;
+        }
+
+        std::cout << (ans == 0 ? "Bob" : "Georgia") << " will win\n";
+    }
+    // system("pause");
+    return 0;
+}
+```
+
+### 拓展
+
+如果最后要将所有的棋子都移到第 0 格， 则继续沿用上述方法， 唯一需要改变的地方是最左边的一段空白要将 0 算进去（原题最左边的空白是 $(0, r)$，而改条件后最左边的空白是 $[0, r)$）。
+
+可以沿用上述方法的原因是等价关系依旧成立。
+
+## [Climbing the Hill](https://acm.hdu.edu.cn/showproblem.php?pid=4315)（更难一点的阶梯博弈）
+
+### 题解（题意见链接）
+
+#### 解题思路
+
+首先当 $k = 1$ 时就可以直接出答案了， 当 $k = 2$ 时， 肯定有个状态是所有的人都排成连续的一排，且最上面的人差一步登顶， 面临这个状态的人是肯定必输的， 所以当 $k = 2$时跟上面一题是一模一样的。
+
+当 $k > 2$ 时， 必输的状态就是前 $k - 2$（包括） 的人全部登顶， 而剩下的就全部排成连续的一排， 且最上面的人差一步登顶。这就相当于前一部分的条件是上一题的拓展题而后一部分的条件是上一题原题。  
+这种情况依然可以直接使用拓展题的代码， 后面一部分的限制还是那句话， 不会影响等价关系。
+
+所以就只用对 2 特判一下就好了
+
+#### CODE
+
+改下上题的输入输出，特判 ``k = 1``， 最后判断的时候这样写就好了：
+
+```cpp
+        if (n & 1) {
+            ans ^= -p.back() - (k == 2);
+        }
 ```
 
 # Hard Problem（难题）
