@@ -282,3 +282,37 @@ std::vector<int> get(std::string &s, int n) {
     return sa;
 }
 ```
+
+## 回文自动机PAM
+
+回文自动机中每个节点的状态表示一个回文子串，为了区分奇长和偶长的回文串，回文自动机中还有奇根和偶根。
+
+回文自动机中的 ``fail[]`` 指向的是当前状态代表的回文子串除自身外最长的回文子串。
+```cpp
+// u 是PAM中状态的编号
+// len是当前状态对应回文子串的长度
+int tr[N][26];
+int len[N], fail[N], tot = 1;
+std::string s;
+int getfail(int u, int i) {
+    while (i - len[u] - 1 < 0 || s[i - len[u] - 1] != s[i]) {
+        u = fail[u];
+    }
+    return u;
+}
+
+int main () {
+    fail[0] = 1;
+    len[1] = -1;
+    std::cin >> s;
+    for (int i = 0, now = 0; i < s.length(); i++) {
+        int c = s[i] - 'a';
+        int pos = getfail(now, i);
+        if (tr[pos][c] == 0) {
+            fail[++tot] = tr[getfail(fail[pos], i)][c];
+            tr[pos][c] = tot, len[tot] = len[pos] + 2;
+        }
+        now = tr[pos][c];
+    }
+}
+```
