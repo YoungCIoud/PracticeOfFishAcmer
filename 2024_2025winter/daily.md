@@ -130,6 +130,16 @@
 
 ## task
 
-- [ ] 学下vim
+- [x] 学下vim
+
+## summary
+
+vim 还是有点意思的
+
+# 25-01-01
+
+## task
+
+- [ ] 补[cf105423](https://codeforces.com/gym/105423)的百人题
 
 ## summary
