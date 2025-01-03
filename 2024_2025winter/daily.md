@@ -158,6 +158,10 @@ vim 还是有点意思的
 
 ## 25-01-03
 
-## task
+**task**
 
-- [ ] vp [cf992Div2](https://codeforces.com/contest/2040)
+- [x] vp [cf992Div2](https://codeforces.com/contest/2040)
+
+**summary**
+
+这场好难，F 题都看不懂
