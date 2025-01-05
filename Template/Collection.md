@@ -2,8 +2,6 @@
 
 ## [Alice's Adventures in Addition](https://codeforces.com/contest/2028/problem/F)（dp的优化 bitset）
 
-### 题解（题意见链接）
-
 **解题思路**
 
 我们可以先想出非常 naive 的 dp：
@@ -102,8 +100,6 @@ void solve()
 ```
 
 ## [Natlan Exploring](https://codeforces.com/contest/2037/problem/G)（dp的优化 容斥）
-
-### 题解（题意见链接）
 
 **解题思路**
 
@@ -209,8 +205,6 @@ void solve()
 
 ## [Chips on a Line](https://codeforces.com/contest/1997/problem/F)（dp好题）
 
-### 题解（题意见链接）
-
 **解题思路**
 
 最基本， 要观察到题目描述和斐波那契数列之间的关系： 消除相邻的两个可以合成后一个， 消除后一个可以得到相邻的前两个， 即$fab[i] = fab[i - 1] + fab[i - 2]$（斐波那契数列）。  
@@ -269,8 +263,6 @@ void solve()
 
 ## [I Hate Sigma Problems](https://atcoder.jp/contests/abc371/tasks/abc371_e)（组合数学 计数）
 
-### 题解（题意见链接）
-
 **解题思路**
 
 首先 $f(l,r)$ 的值是由区间内每个不同的数贡献的,
@@ -284,8 +276,6 @@ void solve()
 用总的区间数减去这个这些区间就是 $x$ 的贡献了.
 
 ## [Takahashi in Narrow Road](https://atcoder.jp/contests/abc371/tasks/abc371_f)（模拟技巧）
-
-### 题解（题意见链接）
 
 **解题思路**
 
@@ -352,8 +342,6 @@ void solve()
 
 ## [Georgia and Bob](http://poj.org/problem?id=1704)（阶梯博弈）
 
-### 题解（题意见链接）
-
 **解题思路**
 
 我们先只看 3 个棋子， 则三个棋子会产生 2 段空白格子。 将中间的棋子往左移会导致左边的空白变少而右边的空白变大， 这就等价于在左边的空白中挑选部分移到右边的空白。
@@ -392,15 +380,13 @@ int main () {
 }
 ```
 
-### 拓展
+**拓展**
 
 如果最后要将所有的棋子都移到第 0 格， 则继续沿用上述方法， 唯一需要改变的地方是最左边的一段空白要将 0 算进去（原题最左边的空白是 $(0, r)$，而改条件后最左边的空白是 $[0, r)$）。
 
 可以沿用上述方法的原因是等价关系依旧成立。
 
 ## [Climbing the Hill](https://acm.hdu.edu.cn/showproblem.php?pid=4315)（更难一点的阶梯博弈）
-
-### 题解（题意见链接）
 
 **解题思路**
 
@@ -422,8 +408,6 @@ int main () {
 ```
 
 ## [Queue Sorting](https://codeforces.com/gym/104857/problem/B)（dp）
-
-### 题解
 
 **解题思路**
 
@@ -463,17 +447,81 @@ for (int i = 1; i <= m + 1; i++) {
 std::cout << ans << '\n';
 ```
 
+## Country Meow ([cf101981](https://codeforces.com/gym/101981)D)（三分）
 
+**题意**
+
+在三维坐标系上设立一个点，使这个点到其他所有点的最大距离最小，输出这个最小值。
+
+**解题思路**
+
+首先可以发现对于这个点，如果我们固定其中两维坐标而只移动一维，那么得到的最大距离是一个关于这一维的单峰函数（比如我们固定 $y$ 和 $z$, 则最大距离函数 $D(x)$ 是关于 $x$ 的单峰函数）。这就想到了用三分去做这道题。在对 $x$ 三分时会涉及到 $D(x)$ 的计算和比较，此时我们将 $x$ 固定为当前三分到的值并去三分 $y$ ，在计算 $D(y)$ ，时我们可以依据计算 $x$ 的思路。
+
+**CODE**
+
+```cpp
+double dis(const point &u, const point &v) {
+    double len = 0;
+    for (int i = 0; i < 3; i++) {
+        len += (u[i] - v[i]) * (u[i] - v[i]);
+    }
+    return len;
+}
+
+double max(const point &p) {
+    double res = 0;
+    for (int i = 0; i < n; i++) {
+        res = std::max(res, dis(p, a[i]));
+    }
+    return res;
+}
+
+double work(point p, int id) {
+    if (id == 3) {
+        return max(p);
+    }
+    auto l = p, r = p;
+    l[id] = -M, r[id] = M;
+    double ans = 0;
+    while (r[id] - l[id] > eps) {
+        double len = (r[id] - l[id]) / 3.0;
+        auto m1 = l, m2 = r;
+        m1[id] = l[id] + len;
+        m2[id] = r[id] - len;
+        
+        double d1 = work(m1, id + 1), d2 = work(m2, id + 1);
+        ans = std::min(d1, d2);
+        if (d1 > d2) {
+            l = m1;
+        }
+        else {
+            r = m2;
+        }
+    }
+    return ans;
+}
+
+void solve() {
+    std::cin >> n;
+    for (int i = 0; i < n; i++) {
+        std::cin >> a[i][0] >> a[i][1] >> a[i][2];
+    }
+    std::cout << std::fixed << std::setprecision(6) << sqrt(work({ 0, 0, 0 }, 0)) << '\n';
+
+    return;
+}
+
+```
 
 # Hard Problem（难题）
 
 ## [Topology](https://codeforces.com/gym/105484/problem/C)（拓扑序 树形dp 数学）
 
-### 题意
+**题意**
 
 给定一颗有 n 个节点且以 1 为根的外向树， 满足父节点的编号小于儿子的编号， 对于每个 $1 \leq i \leq n$ 求满足第 $i$ 个点在拓扑序的第 i 个位置的拓扑序的数量。
 
-### 题解
+**解题思路**
 
 假设我们已经知道了当节点 $u$ 在第 $x$ 个位置时且把子树 $u$ 视为一个点时（不考虑子树 $u$ 的拓扑序）整棵树的拓扑序数量 $dp[u][x]$， 则考虑子树 $u$ 的拓扑序后的整颗树的拓扑序数量就是 $dp[u][x] \times C_{n - x}^{size_u - 1} \times cnt_u $。  其中 $C_{n - x}^{size_u - 1}$的意义是： 在确定点 $u$ 在拓扑序中的位置是 $x$ 后， 要在后面的 $n - x$ 个空位里选 $size_u - 1$ 个位置给子树 $u$ 里除了 $u$ 以为的点。 $cnt_u$ 的就是子树 $u$ 的拓扑序数量。 当 $x = u$ 时上面的式子就是我们要求的答案。
 

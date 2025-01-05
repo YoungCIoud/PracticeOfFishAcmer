@@ -176,4 +176,8 @@ vim 还是有点意思的
 
 **task**
 
-- [ ] 补[cf101981](https://codeforces.com/gym/101981)的银牌及以下的题
+- [x] 补[cf101981](https://codeforces.com/gym/101981)的银牌及以下的题
+
+**summary**
+
+还剩一道字符串的题。突然发现看的题解是 cjb 的题解，太厉害了。
