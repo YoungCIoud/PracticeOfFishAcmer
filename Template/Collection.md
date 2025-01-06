@@ -47,57 +47,7 @@ $2^{14} > 10^4$ 表明对于大于等于 2 的数最多能连乘 13 次，
 可以通过 bitset 的移位加快第二维的转移，
 具体实现看代码。
 
-**CODE**
-
-```cpp
-std::deque<std::pair<int, std::bitset<M + 1>>> q; // 非 0 非 1
-std::bitset<M + 1> all; // 记录当前为止所有出现过的数
-std::bitset<M + 1> cur; // 当前状态
-std::bitset<M + 1> lst; // 上一个的状态
-std::bitset<M + 1> zero; // 开头到目前为止最后一个0的状态
-void init() {
-    q.clear();
-    all = 1;
-    lst = 1;
-    zero = 0;
-}
-
-void solve()
-{
-    init();
-    int n = 0, m = 0;
-    std::cin >> n >> m;
-    while (n--) {
-        int a = 0;
-        std::cin >> a;
-
-        if (a == 0) {
-            cur = zero = all;
-            q.clear();
-        }
-        else if (a == 1) {
-            cur = lst | (lst << 1);
-        }
-        else {
-            cur = zero;
-            q.push_front({ a, lst });
-            for (int i = 0, prd = q[i].first; prd <= m; prd *= q[++i].first) {
-                cur |= (q[i].second << prd);
-                if (i == q.size() - 1) {
-                    break;
-                }
-            }
-            while (q.size() >= L) {
-                q.pop_back();
-            }
-        }
-        
-        lst = cur;
-        all |= cur;
-    }
-    std::cout << (cur[m] ? "Yes" : "No") << '\n';
-}
-```
+**[CODE](../CodeForces/Contest/2028/F.cpp)**
 
 ## [Natlan Exploring](https://codeforces.com/contest/2037/problem/G)（dp的优化 容斥）
 
@@ -125,83 +75,7 @@ for (int i = n; i >= 1; i--) {
 
 在 $M \leq 10^6$ 的情况下， 一个数不同的质因数个数一定小于 7 ， 因为最小的 7 个质数的乘积已经超过 $M$ 了。 所以 $res$ 实际上有小于 $2^7$ 种情况， 再加上质因数分解的复杂度也足够小， We done。
 
-**CODE**
-```cpp
-void solve()
-{
-    // 线性筛
-    std::vector<int> prime;
-    std::vector vis(SM + 1, false);
-    for (int i = 2; i <= SM; i++) {
-        if (not vis[i]) {
-            prime.push_back(i);
-        }
-        for (auto &p : prime) {
-            if (p * i > SM) {
-                break;
-            }
-            vis[p * i] = true;
-            if (i % p == 0) {
-                break;
-            }
-        }
-    }
-
-    int n = 0;
-    std::cin >> n;
-    std::vector a(n + 1, 0);
-    for (int i = 1; i <= n; i++) {
-        std::cin >> a[i];
-    }
-    std::vector dp(n + 1, 0ll), cnt(M + 1, 0ll);
-    dp[n] = 1;
-    for (int i = n; i >= 1; i--) {
-        // 分解质因数
-        std::vector<int> p;
-        for (int j = 0; prime[j] * prime[j] <= a[i]; j++) {
-            if (a[i] % prime[j] == 0) {
-                p.push_back(prime[j]);
-                while (a[i] % prime[j] == 0) {
-                    a[i] /= prime[j];
-                }
-            }
-        }
-        if (a[i] != 1) {
-            p.push_back(a[i]);
-        }
-
-        // 容斥
-        // 枚举质因数的所有组合
-        for (auto s = 1; s < (1 << p.size()); s++) {
-            bool flag = false;
-            int res = 1;
-            for (int j = 0; j < p.size(); j++) {
-                if (s >> j & 1) {
-                    flag = !flag;
-                    res *= p[j];
-                }
-            }
-            if (flag) {
-                (dp[i] += cnt[res]) %= Mod;
-            }
-            else {
-                (dp[i] += Mod - cnt[res]) %= Mod;
-            }
-        }
-        for (auto s = 1; s < (1 << p.size()); s++) {
-            int res = 1;
-            for (int j = 0; j < p.size(); j++) {
-                if (s >> j & 1) {
-                    res *= p[j];
-                }
-            }
-            (cnt[res] += dp[i]) %= Mod;
-        }
-    }
-    std::cout << dp[1] << '\n';
-    return;
-}
-```
+**[CODE](../CodeForces/Contest/2037/G.cpp)**
 
 ## [Chips on a Line](https://codeforces.com/contest/1997/problem/F)（dp好题）
 
@@ -220,46 +94,7 @@ void solve()
 
 求特定的和也是一个完全背包问题。
 
-**CODE**
-```cpp
-void solve()
-{
-    int n = 0, x = 0, m = 0;
-    std::cin >> n >> x >> m;
-
-    std::vector<int> fab(L + 1, 1);
-    for (int i = 3; i <= L; i++) {
-        fab[i] = fab[i - 1] + fab[i - 2];
-    }
-
-    // dp[i][j] 将数字 i 划分成 j 个数的方案数
-    dp[0][0] = 1;
-    for (int k = 1; k <= x; k++) {
-        for (int i = fab[k]; i <= n * fab[k]; i++) {
-            for (int j = 1; j <= n; j++) {
-                (dp[i][j] += dp[i - fab[k]][j - 1]) %= Mod;
-            }
-        }
-    }
-
-    std::vector<int> mn(n * fab[x] + 1, Inf);
-    mn[0] = 0;
-    for (int i = 1; i <= L; i++) {
-        for (int j = fab[i]; j <= n * fab[x]; j++) {
-            mn[j] = std::min(mn[j], mn[j - fab[i]] + 1);
-        }
-    }
-    int ans = 0;
-    for (int i = 1; i <= n * fab[x]; i++) {
-        if (mn[i] == m) {
-            (ans += dp[i][n]) %= Mod;
-        }
-    }
-    std::cout << ans << '\n';
-    
-    return;
-}
-```
+**[CODE](../CodeForces/Contest/1997/F.cpp)**
 
 ## [I Hate Sigma Problems](https://atcoder.jp/contests/abc371/tasks/abc371_e)（组合数学 计数）
 
@@ -291,54 +126,7 @@ void solve()
 2. 若下一块的位置在指定位置之后, 那就将新的块移动到指定位置.
 3. 否则将新的块合并到下一块(注意这步还要将该块的第一个人删掉)上, 此时形成的块的的第一个人仍然是我们指定的人.
 
-**CODE**
-```cpp
-// idx 是指定的人
-// tar 是目标位置
-{
-    f[idx] = tar;
-    it = f.find(idx);
-    while (true) {
-        auto nxt = std::next(it);
-        if (nxt == f.end()) {
-            ans += 1ll * (tar - pos) * (n - idx + 1);
-            break;
-        }
-        if (nxt->second > tar) {
-            ans += 1ll * (tar - pos) * (nxt->first - idx);
-            break;
-        }
-        ans += 1ll * (nxt->second - pos) * (nxt->first - idx);
-        pos = nxt->second;
-        f.erase(nxt);
-    }
-}
-```
-将一个人左移考虑的方法是一样的, 但实现稍有不同:
-```cpp
-{
-    // idx后形成一个新的块
-    if (idx < n && f.count(idx + 1) == false) {
-        f[idx + 1] = pos;
-    }
-    while (true) {
-        if (it == f.begin()) {
-            ans += 1ll * (pos - tar) * idx;
-            break;
-        }
-        auto prv = std::prev(it);
-        if (prv->second < tar) {
-            ans += 1ll * (pos - tar) * (idx - it->first + 1);
-            break;
-        }
-        ans += 1ll * (pos - prv->second) * (idx - it->first + 1);
-        pos = prv->second;
-        f.erase(it);
-        it = prv;
-    }
-    it->second = tar;
-    }
-```
+**[CODE](../AtCoder/abc371/F.cpp)**
 
 ## [Georgia and Bob](http://poj.org/problem?id=1704)（阶梯博弈）
 
@@ -397,15 +185,7 @@ int main () {
 
 所以就只用对 2 特判一下就好了
 
-**CODE**
-
-改下上题的输入输出，特判 ``k = 1``， 最后判断的时候这样写就好了：
-
-```cpp
-        if (n & 1) {
-            ans ^= -p.back() - (k == 2);
-        }
-```
+**[CODE](../HDU/Games/4315.cpp)**
 
 ## [Queue Sorting](https://codeforces.com/gym/104857/problem/B)（dp）
 
@@ -417,35 +197,7 @@ int main () {
 
 假设现在我们的前 $i$ 个数已经组成了一个 LIS 小于等于 2 的序列（长度是 $\sum_{k = 1}^ia[k]$），接下来我们要考虑插入第 $i + 1$ 数。首先有个很显然的位置是一定可以插的，那就是第一个数前面的位置，其次要想插入 $i + 1$ 后 LIS 仍小于等于 2， 我们就只能把 $i + 1$ 插在第 $j$ 个数之前（j 是 LIS 长度等于 2 第一个位置，满足前 $j$ 个数 LIS 的长度是 2 而前 $j - 1$ 个数的是 1），于是我们枚举第一个在在第一个数之后的 $i + 1$ 对位置， 在这之后的剩下的 $i + 1$ 就可以用组合数来算
 
-**CODE**
-
-```cpp
-// dp[i][j]: 序列由前i个数组成且最早出现LIS = 2的地方在第j个位置
-std::vector dp(n + 5, std::vector(m + 5, 0ll));
-dp[0][1] = 1;
-for (int i = 1, pre = 0; i <= n; pre += a[i], i++) {
-    for (int j = 1; j <= pre + 1; j++) {
-        if (dp[i - 1][j] == 0) {
-            continue;
-        }
-
-        // 枚举在 1 的后面，出现的第一个 i
-        for (int k = 1; k < j; k++) {
-            // 枚举 1 前面的 i
-            for (int x = 0; x < a[i]; x++) {
-                (dp[i][x + k + 1] += dp[i - 1][j] * C[j - k - 1 + a[i] - x - 1][a[i] - x - 1]) %= Mod;
-            }
-        }
-        // x = a[i]
-        (dp[i][j + a[i]] += dp[i - 1][j]) %= Mod;
-    }
-}
-i64 ans = 0;
-for (int i = 1; i <= m + 1; i++) {
-    (ans += dp[n][i]) %= Mod;
-}
-std::cout << ans << '\n';
-```
+**[CODE](../CodeForces/Gym/104857/B.cpp)**
 
 ## Country Meow ([cf101981](https://codeforces.com/gym/101981)D)（三分）
 
@@ -457,61 +209,19 @@ std::cout << ans << '\n';
 
 首先可以发现对于这个点，如果我们固定其中两维坐标而只移动一维，那么得到的最大距离是一个关于这一维的单峰函数（比如我们固定 $y$ 和 $z$, 则最大距离函数 $D(x)$ 是关于 $x$ 的单峰函数）。这就想到了用三分去做这道题。在对 $x$ 三分时会涉及到 $D(x)$ 的计算和比较，此时我们将 $x$ 固定为当前三分到的值并去三分 $y$ ，在计算 $D(y)$ ，时我们可以依据计算 $x$ 的思路。
 
-**CODE**
+**[CODE](../CodeForces/Gym/101981/D.cpp)**
 
-```cpp
-double dis(const point &u, const point &v) {
-    double len = 0;
-    for (int i = 0; i < 3; i++) {
-        len += (u[i] - v[i]) * (u[i] - v[i]);
-    }
-    return len;
-}
+## Mediore String Problem ([cf101981](https://codeforces.com/gym/101981)M)
 
-double max(const point &p) {
-    double res = 0;
-    for (int i = 0; i < n; i++) {
-        res = std::max(res, dis(p, a[i]));
-    }
-    return res;
-}
+**解题思路**
 
-double work(point p, int id) {
-    if (id == 3) {
-        return max(p);
-    }
-    auto l = p, r = p;
-    l[id] = -M, r[id] = M;
-    double ans = 0;
-    while (r[id] - l[id] > eps) {
-        double len = (r[id] - l[id]) / 3.0;
-        auto m1 = l, m2 = r;
-        m1[id] = l[id] + len;
-        m2[id] = r[id] - len;
-        
-        double d1 = work(m1, id + 1), d2 = work(m2, id + 1);
-        ans = std::min(d1, d2);
-        if (d1 > d2) {
-            l = m1;
-        }
-        else {
-            r = m2;
-        }
-    }
-    return ans;
-}
+首先题目中所描述的三元组很容易转化成在串 $s$ 中找一个串，这个串能够分成两部分，前面一部分跟等长的 $t$ 的前缀能够首尾相接成为一个回文串，后面一部分也是回文串。
 
-void solve() {
-    std::cin >> n;
-    for (int i = 0; i < n; i++) {
-        std::cin >> a[i][0] >> a[i][1] >> a[i][2];
-    }
-    std::cout << std::fixed << std::setprecision(6) << sqrt(work({ 0, 0, 0 }, 0)) << '\n';
+我们把 $s$ 反过来，这样就变成了在 $s$ 中找一个串，这个串能够分成两部分，前面一部分是回文串，后面一部分是 $t$ 的一个前缀，并且我们在找这个前缀时，肯定是要找最长的。  
+对于前一部分回文串，直接用 PAM 计算出以 $i$ 结尾有多少回文串（就是维护 fail 树每个节点的深度）。对于后面一部分匹配前缀，我们拼接两个串`p = t + "*" + s`，
+这样就可以方便得用 Z 函数解决这个问题。因为 Z 函数维护的就是串的每个后缀的前缀最长能与多长的原串的前缀相匹配。
 
-    return;
-}
-
-```
+**[CODE](../CodeForces/Gym/101981/M.cpp)**
 
 # Hard Problem（难题）
 
@@ -538,64 +248,4 @@ $$
 $cnt_u \over C_{size_u - 1}^{size_v} \times cnt_v$ 就是剩余点拓扑序的数量（记为 $A$ ）， 理由如下：  
 首先 $u$ 节点的位置是确定的不做考虑， 当我们已经知道了 $A$ 和 $cnt_v$ 就可以求出 $cnt_u$ 了， 即 $cnt_u = A \times C_{size_u - 1}^{size_v} \times cnt_v$。 排列数的意义是子树 $u$ 除了 $u$ 以外还有 $size_u - 1$ 个位置， 在其中选 $size_v$ 个给子树 $v$ 里的点。
 
-**CODE**
-```cpp
-i64 init(int cur) {
-    siz[cur] = 1;
-    i64 inv_mul = 1;
-    for (auto &to : g[cur]) {
-        (inv_mul *= init(to)) %= Mod;
-        siz[cur] += siz[to];
-    }
-    (inv_mul *= inv(siz[cur])) %= Mod;
-    // 子树 cur 的拓扑排序的数量 siz[cur]! * inv_mul;
-    cnt[cur] = fac[siz[cur]] * inv_mul % Mod;
-    return inv_mul;
-}
-
-void dfs(int cur, int fa, int deep) {
-    i64 num = cnt[fa] * inv(C[siz[fa] - 1][siz[cur]] * cnt[cur] % Mod) % Mod;
-    for (int pos = deep; pos + siz[cur] <= n + 1; pos++) {
-        // num 在子树 fa 内去掉子树 cur 后所得的树的拓扑排序的数量
-        // num * C[siz[fa] - 1][siz[cur]] * cnt[cur] = cnt[fa]
-        if (dp[fa][pos - 1] != 0) {
-            dp[cur][pos] = dp[fa][pos - 1] * C[n - (pos - 1) - siz[cur]][siz[fa] - 1 - siz[cur]] % Mod * num % Mod;
-        }
-        (dp[cur][pos] += dp[cur][pos - 1]) %= Mod;
-    }
-    for (auto &to : g[cur]) {
-        dfs(to, cur, deep + 1);
-    }
-    return;
-}
-
-void solve()
-{
-    std::cin >> n;
-    for (int i = 2; i <= n; i++) {
-        int fa = 0;
-        std::cin >> fa;
-        g[fa].push_back(i);
-    }
-    // 组合数 && 阶乘
-    fac[0] = 1, C[0][0] = 1;
-    for (int i = 1; i <= n; i++) {
-        fac[i] = (fac[i - 1] * i) % Mod;
-        C[i][0] = 1;
-        for (int j = 1; j <= i; j++) {
-            C[i][j] = (C[i - 1][j - 1] + C[i - 1][j]) % Mod;
-        }
-    }
-    init(1);
-    dp[1][1] = 1;
-    for (auto &to : g[1]) {
-        dfs(to, 1, 2);
-    }
-
-    for (int i = 1; i <= n; i++) {
-        std::cout << dp[i][i] * C[n - i][siz[i] - 1] % Mod * cnt[i] % Mod << " \n"[i == n];
-    }
-
-    return;
-}
-```
+**[CODE](../CodeForces/Gym/105484/C.cpp)**
