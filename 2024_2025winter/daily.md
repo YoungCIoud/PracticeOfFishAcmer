@@ -200,7 +200,11 @@ vim 还是有点意思的
 
 **task**
 
-- [ ] 继续整以下静态网页
-- [ ] 补一场 Div2
-- [ ] 30min keybr.com
+- [x] 继续整一下静态网页
+- [x] 补一场 Div2
+- [x] 30min keybr.com
 - [ ] 60min vim
+
+**summary**
+
+今天来不及学 vim 了，熬夜都要把静态网页整出来
