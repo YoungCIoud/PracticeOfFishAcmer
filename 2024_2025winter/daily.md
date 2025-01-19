@@ -213,7 +213,13 @@ vim 还是有点意思的
 
 **task**
 
-- [ ] 补一场 Div2
-- [ ] 30min keybr.com
-- [ ] 60min vim
+- [x] 补一场 Div2
+- [x] 30min keybr.com
+- [x] 60min vim
 - [ ] 阅读静态网页的文档，已经发了一篇blog，但还是需要调整
+
+## 25-01-19
+
+**summary**
+
+训练强度有点低了……
