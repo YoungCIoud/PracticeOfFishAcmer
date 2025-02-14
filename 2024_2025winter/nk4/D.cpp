@@ -37,6 +37,7 @@ void solve()
     int cen = a.length() - b.length(); // 中心
     int len = n - cen; // 两侧
     for (int i = 0; i < 26; i++) {
+        // 有相同的就放回文串两侧
         if (cnta[i] > cntb[i]) {
             len -= cntb[i];
             cnta[i] -= cntb[i];
@@ -50,6 +51,7 @@ void solve()
     }
 
     for (int i = 0; i < 26 && cen >= 2; i++) {
+        // 成对的字母可以放在中心得两侧
         while (cen >= 2 && cnta[i] >= 2) {
             cen -= 2;
             cnta[i] -= 2;

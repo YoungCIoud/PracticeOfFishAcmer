@@ -17,7 +17,6 @@ constexpr i64 Mod = 998244353;
 constexpr int N = 2e5, M = 5e5, Inf = 1e9;
 std::vector<int> g[N + 5], col(N + 5);
 std::vector<std::pair<int, int>> reg; // 区域的大小和最小的编号
-std::vector<int> node;
 bool vis[N + 5]; // dfs
 bool inq[N + 5];
 
@@ -30,25 +29,14 @@ void dfs(int cur, int c, int &cnt) {
     }
 }
 
-void dfs(int cur) {
-    vis[cur] = true;
-    node.push_back(cur);
-    for (auto &to : g[cur]) {
-        if (not vis[to]) {
-            dfs (to);
-        }
-    }
-}
-
 void solve()
 {
     int n = 0, m = 0, k = 0;
     std::cin >> n >> m >> k;
 
     reg.clear();
-    node.clear();
     for (int i = 1; i <= n; i++) {
-        vis[i] = inq[i] = false;
+        inq[i] = false;
         g[i].clear();
         col[i] = 0;
     }
@@ -81,14 +69,16 @@ void solve()
     int ans = 0;
     for (int i = 0; i < std::min(k, int(reg.size())); i++) {
         ans += reg[i].first;
-        dfs(reg[i].second);
         q.push(reg[i].second);
         inq[reg[i].second] = true;
     }
-    std::sort(node.begin(), node.end()); // 在剩余的传送次数用完前，应该按 node 中的顺序输出
-    auto it = node.begin();
     k -= reg.size();
-
+    std::vector<int> node(n, 0);
+    for (int i = 0; i < n; i++) {
+        node[i] = i + 1;
+    }
+    auto it = node.begin();
+    
     std::cout << ans << '\n';
     while (not q.empty()) {
         int cur = 0;

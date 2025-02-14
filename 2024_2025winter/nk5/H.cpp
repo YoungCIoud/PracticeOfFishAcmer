@@ -60,7 +60,8 @@ void solve()
     else {
         for (int len = 1; len + k - 1<= n; len++) {
             for (int i = 0; i + len <= n; i++) {
-                (ans += quiry(i, i + len) * C[n - len - 1][k - 2] % Mod) %= Mod;
+                int d = (i == 0 || i + len == n) ? 1 : 2;
+                (ans += quiry(i, i + len) * C[n - len - d][k - 1 - d] % Mod) %= Mod;
             }
         }
     }
