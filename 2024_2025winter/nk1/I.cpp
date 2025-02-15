@@ -18,13 +18,13 @@ constexpr int N = 1e5, M = 1e5, Inf = 1e9;
 
 void solve()
 {
-    int n = 0, k = 0;
+    int n = 0;
+    i64 k = 0;
     std::cin >> n >> k;
     std::vector<int> pos(n + 1, 0), p(n + 1, 0);
     for (int i = 1; i <= n; i++) {
-        int a = 0;
-        std::cin >> a;
-        pos[a] = i;
+        std::cin >> p[i];
+        pos[p[i]] = i;
     }
 
     if (k < n) {
@@ -32,7 +32,59 @@ void solve()
         return;
     }
 
-    
+    int lst = 0, x = 0;
+    for (int i = n; i >= 1; i--) {
+        if (k + 1 >= (i << 1)) {
+            k -= i;
+        }
+        else {
+            lst = i;
+            x = k - (i - 1);
+            break;
+        }
+    }
+
+    if (x % 2 == 0 && x != 0) {
+        p[pos[1]] = lst;
+        for (int i = 2, j = 1; i <= lst; i++, j++) {
+            i = (i == x ? i + 1 : i);
+            j = (j == x ? j + 1 : j);
+            p[pos[i]] = j;
+        }
+    }
+    else if (x == 1) {
+        p[pos[1]] = lst;
+        for (int i = 2; i <= lst; i++) {
+            p[pos[i]] = i - 1;
+        }
+    }
+    else if (x == 3) {
+        p[pos[1]] = lst == 4 ? 3 : lst;
+        p[pos[2]] = 4;
+        p[pos[3]] = 1;
+        p[pos[4]] = 2;
+        if (lst >= 5) {
+            p[pos[5]] = 3;
+        }
+        for (int i = 6, j = 5; i <= lst; i++, j++) {
+            p[pos[i]] = j;
+        }
+    }
+    else if (x != 0) {
+        p[pos[1]] = lst;
+        p[pos[3]] = 1;
+        x--;
+        for (int i = 4, j = 3; i <= lst; i++, j++) {
+            i = (i == x ? i + 1 : i);
+            j = (j == x ? j + 1 : j);
+            p[pos[i]] = j;
+        }
+    }
+
+    for (int i = 1; i <= n; i++) {
+        std::cout << p[i] << " \n"[i == n];
+    }
+    return;
 }
 
 int main()
