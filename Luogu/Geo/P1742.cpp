@@ -1,0 +1,97 @@
+#include<bits/stdc++.h>
+
+#ifdef LOCAL_MACHINE
+    #define debug(...) printf(__VA_ARGS__)
+    #define sp() system("pause")
+    #define IOS
+#else
+    #define debug(...)
+    #define sp()
+    #define IOS std::ios::sync_with_stdio(false), std::cin.tie(0), std::cout.tie(0)
+#endif
+
+using i64 = long long;
+using u64 = unsigned long long;
+using i128 = __int128_t;
+
+constexpr i64 Mod = 998244353;
+constexpr int N = 1e5, MAX = 1e4;
+constexpr double EPS = 1e-9;
+
+using point = std::array<double, 2>;
+point a[N + 5];
+
+double dis2(point &u, point &v) {
+    double x = u[0] - v[0], y = u[1] - v[1];
+    return x * x + y * y;
+}
+
+point cen(point &u, point &v) {
+    return { (u[0] + v[0]) / 2.0, (u[1] + v[1]) / 2.0 };
+}
+point cen(point &u, point &v, point &w) {
+    auto &[x1, y1] = u;
+    auto &[x2, y2] = v;
+    auto &[x3, y3] = w;
+
+    double A = x2 * x2 + y2 * y2 - x1 * x1 - y1 * y1, B = x3 * x3 + y3 * y3 - x1 * x1 - y1 * y1;  
+    double x = (A * (y3 - y1) - B * (y2 - y1)) / (2.0 * (x2 - x1) * (y3 - y1) - 2.0 * (x3 - x1) * (y2 - y1));
+    double y = (A * (x3 - x1) - B * (x2 - x1)) / (2.0 * (y2 - y1) * (x3 - x1) - 2.0 * (y3 - y1) * (x2 - x1));
+    return { x, y };
+}
+
+void solve() {
+    int n = 0;
+    std::cin >> n;
+    for (int i = 0; i < n; i++) {
+        std::cin >> a[i][0] >> a[i][1];
+    }
+    std::random_shuffle(a, a + n);
+
+    point O = a[0];
+    double r = 0;
+    // std::cout << O[0] << ' ' << O[1] << ' ' << r << '\n';
+    for (int i = 1; i < n; i++) {
+        if (dis2(O, a[i]) - r <= EPS) {
+            continue;
+        }
+
+        O = a[i], r = 0;
+        // std::cout << O[0] << ' ' << O[1] << ' ' << r << '\n';
+        
+        for (int j = 0; j < i; j++) {
+            if (dis2(O, a[j]) - r <= EPS) {
+                continue;
+            }
+            
+            O = cen(a[i], a[j]), r = dis2(O, a[j]);
+            // std::cout << O[0] << ' ' << O[1] << ' ' << r << '\n';
+            for (int k = 0; k < j; k++) {
+                if (dis2(O, a[k]) - r <= EPS) {
+                    continue;
+                }
+                
+                O = cen(a[i], a[j], a[k]), r = dis2(O, a[i]);
+                // std::cout << O[0] << ' ' << O[1] << ' ' << r << '\n';
+            }
+        }
+    }
+
+    std::cout << std::fixed << std::setprecision(10) << std::sqrt(r) << '\n';
+    std::cout << O[0] << ' ' << O[1] << '\n';
+    return;
+}
+
+int main()
+{
+    IOS;
+    int _t = 1;
+//    std::cin >> _t;
+    
+    while (_t--)
+    {
+        solve();
+    }
+
+    return 0;
+}
