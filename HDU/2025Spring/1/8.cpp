@@ -42,10 +42,6 @@ point cen(point &u, point &v, point &w) {
     return { x, y };
 }
 
-i64 area(std::array<i64, 2> &u, std::array<i64, 2> &v, std::array<i64, 2> &w) { 
-    return std::abs((u[0] * (v[1] - w[1]) + v[0] * (w[1] - u[1]) + w[0] * (u[1] - v[1])));
-}
-
 void solve() {
     int n = 0;
     std::cin >> n;
@@ -54,12 +50,9 @@ void solve() {
         a[i][0] = b[i][0], a[i][1] = b[i][1];
     }
     double Sr = 0;
-    // for (int i = 0; i < n; i++) {
-    //     int j = (i + 1) % n;
-    //     Sr += (b[i][0] * b[j][1] - b[j][0] * b[i][1]);
-    // }
-    for (int i = 2; i < n; i++) {
-        Sr += area(b[0], b[i - 1], b[i]);
+    for (int i = 0; i < n; i++) {
+        int j = (i + 1) % n;
+        Sr += (b[i][0] * b[j][1] - b[j][0] * b[i][1]);
     }
     Sr /= 2.0;
 
