@@ -10,37 +10,48 @@
 #endif
 
 using i64 = long long;
+using u64 = unsigned long long;
+using i128 = __int128_t;
+
+constexpr i64 Mod = 998244353;
+constexpr int N = 1e5, M = 1e5, Inf = 1e9;
+
+i64 a[N + 5];
+std::vector<int> g[N + 5];
+
+int ans;
+void dfs(int cur, i64 gcd) {
+    if (g[cur].empty()) {
+        if (__builtin_popcount(gcd) <= 1) {
+            ans++;
+        }
+        return;
+    }
+
+    for (auto &to : g[cur]) {
+        dfs(to, std::__gcd(gcd, std::abs(a[to] - a[cur])));
+    }
+}
 
 void solve()
 {
-    i64 k = 0, b = 0, c = 0, v = 0;
-    std::cin >> k >> b >> c >> v;
-    i64 ans = 0, l = 0, r = (1ll << 61) / k;
-    for (int bit = 61; ~bit; bit--) {
-        i64 ll = l, rr = r;
-        while (ll <= rr) {
-            i64 m = ll + rr >> 1;
-            if ((k * m + b) >> bit & 1) {
-                rr = m - 1;
-            }
-            else {
-                ll = m + 1;
-            }
-        }
-        std::array<i64, 2> rng[2] = { { l, rr }, { ll, r } };
-
-        int cur = c >> bit & 1;
-        if (v >> bit & 1) {
-            ans += rng[cur][1] - rng[cur][0] + 1;
-            l = rng[cur ^ 1][0];
-            r = rng[cur ^ 1][1];
-        }
-        else {
-            l = rng[cur][0];
-            r = rng[cur][1];
-        }
+    int n = 0;
+    std::cin >> n;
+    for (int i = 1; i <= n; i++) {
+        g[i].clear();
     }
-    std::cout << ans + (r - l + 1) << '\n';
+    for (int i = 2; i <= n; i++) {
+        int f = 0;
+        std::cin >> f;
+        g[f].push_back(i);
+    }
+    for (int i = 1; i <= n; i++) {
+        std::cin >> a[i];
+    }
+
+    ans = 0;
+    dfs(1, 0);
+    std::cout << ans << '\n';
 }
 
 int main()
