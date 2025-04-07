@@ -133,3 +133,56 @@ inline bool cmp(Node &A, Node &B)
 ```
 
 **例题** [Almost Convex](https://codeforces.com/gym/104901/problem/M)
+
+## 求多边形面积
+```cpp
+double get() {
+    double S = 0;
+    for (int i = 0; i < n; i++) {
+        int j = (i + 1) % n;
+        S += (a[i].x * a[j].y - a[j].x * a[i].y);
+    }
+    return S / 2.0
+}
+```
+
+## 最小增量法求最小圆覆盖
+```cpp
+void solve() {
+    // code ...
+
+    // 将读入的点集重新排列
+    // 防止被特定的数据卡
+    std::random_shuffle(a, a + n);
+    
+    // 对于一个点，最小圆就是半径为 0 的。
+    point O = a[0];
+    double r = 0;
+    // 逐步加入第 i 个点
+    for (int i = 1; i < n; i++) {
+        // 在圆就不变
+        if (dis2(O, a[i]) - r <= EPS) {
+            continue;
+        }
+
+        // 不在就重新确定圆
+        O = a[i], r = 0;
+        for (int j = 0; j < i; j++) {
+            if (dis2(O, a[j]) - r <= EPS) {
+                continue;
+            }
+            // 由两个点确定的最小圆
+            O = cen(a[i], a[j]), r = dis2(O, a[j]);
+            for (int k = 0; k < j; k++) {
+                if (dis2(O, a[k]) - r <= EPS) {
+                    continue;
+                }
+                // 由三个点确定的最小圆
+                O = cen(a[i], a[j], a[k]), r = dis2(O, a[i]);
+            }
+        }
+    }
+
+    // code ...
+}
+```

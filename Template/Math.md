@@ -259,3 +259,140 @@ $$
 S(n,k) = S(n - 1, k - 1) + kS(n - 1, k), 1\leq k \leq n
 $$
 且$$S(0,0) = 1, S(n, 0) = 0,1 \leq n$$
+
+## Lucas 定理
+
+```cpp
+class Lucas {
+private:
+    int mod;
+    std::vector<i64> fa, ifa;
+    
+    int cnt(int n, int m) {
+        if (n < m) {
+            return 0;
+        }
+        return fa[n] * ifa[m] * ifa[n - m] % mod;
+    }
+public:
+    // 根据模数预处理阶乘和阶乘逆元
+    Lucas(int m): mod(m) {
+        fa.assign(mod, 1ll);
+        for (int i = 1; i < mod; i++) {
+            fa[i] = fa[i - 1] * i % mod;
+        }
+        ifa.assign(mod, mod - 1); // 威尔逊定理
+        for (int i = mod - 1; i > 0; i--) {
+            ifa[i - 1] = ifa[i] * i % mod;
+        }
+    }
+
+    int C(int n, int m) {
+        i64 res = 1;
+        while (m) {
+            (res *= cnt(n % mod, m % mod)) %= mod;
+            n /= mod;
+            m /= mod;
+        }
+        return res;
+    }
+};
+```
+
+## 二维平面中曼哈顿距离与切比雪夫距离的相互转换
+
+$$
+\begin{aligned}
+M(u, v) &= |x_1 - x_2| + |y_1 - y_2| \\
+&= \max\{ x_1 - x_2 + y_1 - y_2, x_2 - x_1 + y_1 - y_2, x_1 - x_2 + y_2 - y_1, x_2 - x_1 + y_2 - y_1\} \\
+&= \max\{|(x_1 + y_1) - (x_2 + y_2)|, |(x_1 - y_1) - (x_2 - y_2)| \} \\
+&= Q((x_1 + y_1, x_1 - y_1), (x_2 + y_2, x_2 - y_2))
+\end{aligned}
+$$
+
+## 求勾股数
+
+```cpp
+// 以 c 索引
+std::vector<std::array<int, 2>> R[MXR + 5];
+void solve()
+{
+    for (int i = 1; i * i <= MXR; i++) {
+        for (int j = 1; j < i && i * i + j * j <= MXR; j++) {
+            if ((i + j) % 2 == 0 || std::__gcd(i, j) != 1) {
+                continue;
+            }
+
+            int a = 2 * i * j;
+            int b = i * i - j * j;
+            int c = i * i + j * j;
+            for (int k = 1; c * k <= MXR; k++) {
+                R[c * k].push_back({ a * k, b * k });
+            }
+        }
+    }
+}
+```
+
+## 快速傅里叶变换 FFT
+```cpp
+// M 多项式最大的长度
+std::vector<int> idx(M << 2);
+void fft(int len, std::vector<std::complex<double>> &A, int inv) {
+    for (int i = 1; i < len; i++) {
+        if (i < idx[i]) {
+            std::swap(A[i], A[idx[i]]);
+        }
+    }
+
+    for (int mid = 1; mid < len; mid <<= 1) {
+        std::complex<double> unit(cos(M_PI / mid), inv * sin(M_PI / mid));
+        for (int l = 0; l < len; l += (mid << 1)) {
+            std::complex<double> w(1.0, 0.0);
+            for (int i = 0; i < mid; i++, w *= unit) {
+                std::complex<double> x(A[i | l]), y(w * A[i | l | mid]);
+                A[i | l] = x + y;
+                A[i | l | mid] = x - y;
+            }
+        }
+    }
+
+    for (int i = 0; inv == -1 && i < len; i++) {
+        A[i] /= len;
+    }
+    return;
+}
+
+// 传两个多项式返回这两个多项式相乘（卷积）的结果
+std::vector<i64> converlution(std::vector<i64> &a, std::vector<i64> &b) {
+    int la = a.size() - 1, lb = b.size() - 1;
+    int len = 1;
+    // 长度是 2 的幂且必须大于最高次数
+    while (len <= la + lb) {
+        len <<= 1;
+    }
+    
+    for (int l = 1, r = 1, bit = len >> 1; l < len; l <<= 1, bit >>= 1) {
+        for (int i = 0; i < l; i++) {
+            idx[r++] = idx[i] | bit;
+        }
+    }
+
+    std::vector<std::complex<double>> A(len);
+    for (int i = 0; i < len; i++) {
+        A[i] = std::complex<double>(i <= la ? a[i] : 0.0, i <= lb ? b[i] : 0.0);
+    }
+    fft(len, A, 1);
+    for (int i = 0; i < len; i++) {
+        A[i] = A[i] * A[i];
+    }
+    fft(len, A, -1);
+
+    std::vector res(la + lb + 1, 0ll);
+    for (int i = 0; i <= la + lb; i++) {
+        res[i] = i64(A[i].imag() / 2.0 + 0.5);
+    }
+    return res;
+}
+
+```
