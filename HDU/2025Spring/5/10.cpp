@@ -16,74 +16,40 @@ using u64 = unsigned long long;
 using i128 = __int128_t;
 
 constexpr i64 Mod = 998244353;
-constexpr int N = 5e5;
+constexpr int N = 5e5, Inf = 1e9;
 
-std::vector<int> g[N + 5];
-i64 ans;
-int cnt[2], f[N + 5][2];
-
-i64 C(int x) {
-    return 1ll * x * (x - 1) / 2ll;
-}
+std::vector<std::array<int, 2>> g[N + 5];
+std::array<int, 2> cnt;
 
 void dfs(int cur, int fa, int d) {
-    ans += 6ll * cnt[d];
-    ans += 6ll * C(cnt[d]);
-
     cnt[d]++;
-    i64 c00 = 0, c11 = 0, c10 = 0;
-    for (auto to : g[cur]) {
-        int l = 0;
-        if (to < 0) {
-            to = -to;
-            l = 1;
+    for (auto &[to, val] : g[cur]) {
+        if (to != fa) {
+            dfs(to, cur, d ^ val);
         }
-        if (to == fa) {
-            continue;
-        }
-        
-        dfs(to, cur, d ^ l);
-        c00 += 1ll * f[cur][0] * f[to][0];
-        c10 += 1ll * f[cur][1] * f[to][0] + 1ll * f[cur][0] * f[to][1];
-        c11 += 1ll * f[cur][1] * f[to][1];
-
-        f[cur][0] += f[to][0];
-        f[cur][1] += f[to][1];
     }
-
-    f[cur][d]++;
-    if (d) {
-        ans += 6ll * (c00 + c10);
-    }
-    else {
-        ans += 6ll * (2ll * c00 + c11);
-    }
-
-    return;
 }
 
 void solve()
 {
     int n = 0;
     std::cin >> n;
-
-    ans = n;
+    
     cnt[0] = cnt[1] = 0;
-    for (int i = 1; i <= n; i++) {
+    for (int i = 1; i <= n; i++)  {
         g[i].clear();
-        f[i][0] = f[i][1] = 0;
     }
-    for (int i = 1; i < n; i++) {
+
+    for (int i = 0; i < n - 1; i++) {
         int u = 0, v = 0, w = 0;
         std::cin >> u >> v >> w;
         w %= 2;
-        g[u].push_back(w ? -v : v);
-        g[v].push_back(w ? -u : u);
+        g[u].push_back({ v, w });
+        g[v].push_back({ u, w });
     }
 
     dfs(1, 0, 0);
-    std::cout << ans << '\n';
-
+    std::cout << 1ll * cnt[0] * cnt[0] * cnt[0] + 1ll * cnt[1] * cnt[1] * cnt[1] << '\n';
     return;
 }
 
